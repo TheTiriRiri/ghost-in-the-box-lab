@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# C build artifacts
+*.o
+*.so
+
+# Generated evidence (produced by generators/, committed outputs go in module-casefile/)
+core/evidence-data/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Docker
+.env
+
+# Claude Code
+.claude/
+CLAUDE.md
+
+# OS
+.DS_Store
