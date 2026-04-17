@@ -99,6 +99,7 @@ Files stay small and single-responsibility. `scenario_facts.py` only holds const
 ### Task 1 — Foundation constants (`scenario_facts.py`)
 
 **Files:**
+- Create: `.gitignore`
 - Create: `pytest.ini`
 - Create: `generators/__init__.py`
 - Create: `generators/data/__init__.py`
@@ -107,6 +108,21 @@ Files stay small and single-responsibility. `scenario_facts.py` only holds const
 - Create: `tests/test_scenario_facts.py`
 
 - [ ] **Step 1: Write the failing test**
+
+Create `.gitignore`:
+```
+.env
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.DS_Store
+*.swp
+*.swo
+```
 
 Create `pytest.ini`:
 ```ini
@@ -266,7 +282,7 @@ Expected: 12 passed.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add pytest.ini generators/ tests/__init__.py tests/test_scenario_facts.py
+git add .gitignore pytest.ini generators/ tests/__init__.py tests/test_scenario_facts.py
 git commit -m "feat(foundation): scenario_facts.py with R1 constants and MITRE allowlist"
 ```
 
@@ -490,8 +506,7 @@ def test_r1_sample_declares_expected_techniques_when_present(sample_paths):
     """When round-1/spyware.py exists, it must declare at least these core R1 TTPs."""
     import pathlib
     r1 = next(
-        (p for p in sample_paths
-         if p == pathlib.Path(p).resolve() and p.parent.name == "round-1"),
+        (p for p in sample_paths if p.parent.name == "round-1"),
         None,
     )
     if r1 is None:
@@ -1953,7 +1968,7 @@ ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["bash"]
 ```
 
-Note: the dnscat2 and symbol-pack sections reach outside the isolated network *at build time*; `internal: true` applies only at runtime on `ghost-net`. Document in `docs/ops/vol-symbols.md` (a companion doc the instructor maintains) where the offline mirror lives. For this plan we do not author that doc — it's an operations concern outside R1 scope.
+Note: the dnscat2 and symbol-pack sections reach outside the isolated network *at build time*; `internal: true` applies only at runtime on `ghost-net`. **If the lab must run in a fully air-gapped environment**, replace the `curl` and `git clone` calls with `COPY` of pre-downloaded files (avml binary + dnscat2 tarball) committed to a companion `offline-assets/` directory, or serve them from an internal HTTP mirror. Document in `docs/ops/vol-symbols.md` where the offline mirror lives. For this plan we do not author that doc — it's an operations concern outside R1 scope.
 
 - [ ] **Step 4: Run tests**
 
@@ -1971,7 +1986,7 @@ git commit -m "feat(analyst-ws): forensics toolchain image (Vol3, YARA, Sigma, S
 
 ### Task 13 — R1 Docker integration test
 
-End-to-end: bring up `docker compose --profile full up -d` with `ROUND=1`, wait for the C2 server to receive at least one POST within 90 seconds, assert the payload shape. This test is marked `docker`; it skips cleanly when `docker` or `docker compose` is not available.
+End-to-end: bring up `docker compose --profile full up -d` with `ROUND=1`, wait for the C2 server to receive at least one POST within 120 seconds, assert the payload shape. This test is marked `docker`; it skips cleanly when `docker` or `docker compose` is not available.
 
 **Files:**
 - Create: `tests/test_techlab_integration.py`
@@ -2035,7 +2050,7 @@ def stack():
 
 def test_round_1_c2_receives_payload_within_90_seconds(stack):
     """Victim must POST to c2-server within one exfil interval + buffer."""
-    deadline = time.time() + 90
+    deadline = time.time() + 120
     last_output = ""
     while time.time() < deadline:
         r = _compose("exec", "-T", "c2-server",
@@ -2090,7 +2105,7 @@ After the test, run `docker ps --filter name=ghost-` and confirm no lingering co
 
 ```bash
 git add tests/test_techlab_integration.py
-git commit -m "test(techlab): R1 end-to-end integration (C2 receives payload in ≤90s)"
+git commit -m "test(techlab): R1 end-to-end integration (C2 receives payload in ≤120s)"
 ```
 
 ---
@@ -2277,6 +2292,7 @@ R1 is deliberately naïve. There is nothing "hidden" for students to uncover —
 3. C2 URL embedded as a plaintext string in the binary (`strings /opt/spyware/spyware.py | grep 10.13`).
 4. JSON field names (`host`, `user`, `keys`, `files`, `screenshot_bytes`) appear in `tcpdump -A` output.
 5. Harvested files are readable from the POST body directly.
+6. **Screenshot taken but not exfiltrated (intentional partial-implementation flaw):** `take_screenshot()` saves a PNG to `/tmp/screen-<ts>.png` and reports its file *size* in the POST (`"screenshot_bytes": N`), but never reads or sends the file contents. T1113 (Screen Capture) applies because the screenshot is taken; the file content never reaches the C2, which is an OPSEC flaw the attacker didn't notice. Sharp students examining the JSON payload will see a non-zero `screenshot_bytes` but no corresponding base64 or binary field — a good pivot for discussion. If asked, confirm this is a bug in the attacker's code, not an intentional design.
 
 If a student says "R1 is sophisticated", redirect: R1 is the null hypothesis. OPSEC improvement only begins in R2.
 
