@@ -177,7 +177,7 @@ def test_http_exfil_posts_plaintext_json(monkeypatch):
     assert captured["url"] == "http://10.13.37.1:8080/collect"
     assert captured["json"]["host"] == "workstation-042"
     assert captured["json"]["keys"] == ["h", "i"]
-    assert captured["timeout"] == 10
+    assert captured["timeout"] == exfil_http.HttpExfilClient.DEFAULT_TIMEOUT_SECONDS
 
 
 def test_http_exfil_returns_false_on_network_error(monkeypatch):
@@ -199,3 +199,4 @@ def test_http_exfil_uses_scenario_facts_defaults(monkeypatch):
     from generators.data import scenario_facts as sf
     assert client.host == sf.C2_IP
     assert client.port == sf.C2_HTTP_PORT
+    assert client.timeout == exfil_http.HttpExfilClient.DEFAULT_TIMEOUT_SECONDS
