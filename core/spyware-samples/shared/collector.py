@@ -14,7 +14,6 @@ import os
 import shutil
 import subprocess
 import threading
-import time
 from pathlib import Path
 from typing import Iterable, Optional
 
@@ -24,13 +23,12 @@ class _NullBackend:
 
     def __init__(self, buffer: list[str]) -> None:
         self._buffer = buffer
-        self._running = False
 
     def start(self) -> None:
-        self._running = True
+        pass
 
     def stop(self) -> None:
-        self._running = False
+        pass
 
 
 class _PynputBackend:
@@ -146,8 +144,12 @@ class Keylogger:
         if requested is not None and requested not in self.BACKEND_PREFERENCE:
             raise ValueError(f"unknown backend: {requested!r}")
         if requested == "xlib":
+            if not self._xlib_usable():
+                raise ValueError("backend 'xlib' requested but not available (no DISPLAY or python-xlib missing)")
             return "xlib"
         if requested == "pynput":
+            if not self._pynput_usable():
+                raise ValueError("backend 'pynput' requested but not available (no DISPLAY or pynput missing)")
             return "pynput"
         # Auto-detect.
         if self._xlib_usable():
