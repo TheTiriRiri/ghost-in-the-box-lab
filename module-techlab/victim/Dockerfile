@@ -8,7 +8,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     DISPLAY=:99
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        python3 python3-pip python3-venv \
+        python3 python3-pip python3-venv python3-dev \
+        python3-evdev build-essential linux-libc-dev \
         xvfb scrot xdotool x11-utils \
         ca-certificates cron procps tini \
     && rm -rf /var/lib/apt/lists/*
