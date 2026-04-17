@@ -122,8 +122,8 @@ def test_take_screenshot_invokes_scrot_with_output_path(tmp_path, monkeypatch):
 
     def fake_run(cmd, *a, **kw):
         calls.append(cmd)
-        output = cmd[-1]
-        open(output, "wb").write(b"\x89PNG\r\n\x1a\n")
+        from pathlib import Path as _Path
+        _Path(cmd[-1]).write_bytes(b"\x89PNG\r\n\x1a\n")
 
         class _R:
             returncode = 0

