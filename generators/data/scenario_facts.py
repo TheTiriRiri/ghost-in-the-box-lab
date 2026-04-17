@@ -25,6 +25,9 @@ VICTIM_HOSTNAME: str = "workstation-042"
 # Exfil cadence in seconds.
 EXFIL_INTERVAL_SECONDS: int = 60
 
+# Scratch directory for transient artifacts (screenshots) inside the victim container.
+SCREENSHOT_DIR: str = "/tmp"
+
 # Files the spyware steals (relative to victim $HOME).
 STOLEN_FILES: list[str] = [
     ".bash_history",
