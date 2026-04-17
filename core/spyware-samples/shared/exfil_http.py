@@ -1,7 +1,3 @@
-# GHOST-IN-THE-BOX LAB — EDUCATIONAL SAMPLE
-# Round: 1 | Isolated Docker environment only
-# For use in university cybersecurity courses
-# MITRE ATT&CK: T1071.001, T1041
 """HTTP POST exfiltration for R1 (plaintext) and R2 (HTTPS, via subclass).
 
 Framing is intentionally trivial: POST /collect with a JSON body. Students
