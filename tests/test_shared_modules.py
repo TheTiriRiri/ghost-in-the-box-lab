@@ -50,11 +50,11 @@ def test_keylogger_null_backend_start_stop_is_noop():
 
 
 def test_keylogger_auto_falls_back_when_display_unset(monkeypatch):
-    """Without DISPLAY and with forced xlib-missing, constructor picks pynput or null."""
+    """Without DISPLAY both xlib and pynput are unavailable; constructor must pick null."""
     monkeypatch.delenv("DISPLAY", raising=False)
     from collector import Keylogger
     kl = Keylogger()
-    assert kl.active_backend in {"xlib", "pynput", "null"}
+    assert kl.active_backend == "null"
 
 
 def test_keylogger_raises_on_unknown_backend():

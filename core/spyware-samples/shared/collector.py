@@ -11,11 +11,8 @@ consume these collectors' outputs.
 from __future__ import annotations
 
 import os
-import shutil
-import subprocess
 import threading
-from pathlib import Path
-from typing import Iterable, Optional
+from typing import Optional
 
 
 class _NullBackend:
