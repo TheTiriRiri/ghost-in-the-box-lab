@@ -1,0 +1,10 @@
+volatility3==2.7.0
+yara-python==4.5.1
+sigma-cli==1.0.4
+pandas==2.2.2
+numpy==1.26.4
+scipy==1.13.1
+matplotlib==3.9.0
+jupyterlab==4.2.4
+dnspython==2.6.1
+scapy==2.5.0

@@ -1,0 +1,56 @@
+name: ghost-in-the-box
+
+networks:
+  ghost-net:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.13.37.0/24
+          gateway: 10.13.37.254
+
+services:
+
+  c2-server:
+    profiles: ["full"]
+    build:
+      context: ./c2-server
+    container_name: ghost-c2
+    networks:
+      ghost-net:
+        ipv4_address: 10.13.37.1
+    volumes:
+      - ./c2-server/data:/data
+    restart: unless-stopped
+
+  victim:
+    profiles: ["full"]
+    build:
+      context: ..
+      dockerfile: module-techlab/victim/Dockerfile
+      args:
+        ROUND: "${ROUND:-1}"
+    container_name: ghost-victim
+    depends_on:
+      - c2-server
+    networks:
+      - ghost-net
+    restart: "no"
+
+  analyst-ws:
+    profiles: ["full"]
+    build:
+      context: ./analyst-ws
+    container_name: ghost-analyst
+    networks:
+      - ghost-net
+    volumes:
+      - ../module-casefile:/casefile:ro
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_PTRACE
+      - SYS_ADMIN
+    stdin_open: true
+    tty: true
+    restart: "no"

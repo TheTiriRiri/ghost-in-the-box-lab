@@ -27,3 +27,12 @@ CLAUDE.md
 
 # Git worktrees
 .worktrees/
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+
+# Editor swap files
+*.swp
+*.swo

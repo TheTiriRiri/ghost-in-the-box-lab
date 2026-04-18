@@ -1,0 +1,3 @@
+Mar 14 08:00:00 workstation-042 systemd-logind[841]: New session 3 of user analyst.
+Mar 14 08:00:02 workstation-042 login[1032]: pam_unix(login:session): session opened for user analyst(uid=1000) by LOGIN(uid=0)
+Mar 14 08:00:12 workstation-042 su[1140]: pam_unix(su:session): session opened for user analyst by analyst(uid=1000)
