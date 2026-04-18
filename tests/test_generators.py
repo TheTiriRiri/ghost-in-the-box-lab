@@ -49,3 +49,37 @@ def test_generate_pcap_rejects_unknown_round(tmp_path):
     from generators import generate_pcap
     with pytest.raises(ValueError, match="round"):
         generate_pcap.generate(output_path=tmp_path / "x.pcap", round_num=7)
+
+
+# --- generate_logs ---------------------------------------------------------
+
+def test_generate_logs_is_deterministic(tmp_path):
+    from generators import generate_logs
+
+    a = tmp_path / "a"
+    b = tmp_path / "b"
+    a.mkdir(); b.mkdir()
+
+    generate_logs.generate(output_dir=a, round_num=1)
+    generate_logs.generate(output_dir=b, round_num=1)
+
+    assert (a / "auth.log").read_text() == (b / "auth.log").read_text()
+    assert (a / "syslog").read_text() == (b / "syslog").read_text()
+
+
+def test_generate_logs_produces_expected_files(tmp_path):
+    from generators import generate_logs
+
+    generate_logs.generate(output_dir=tmp_path, round_num=1)
+    assert (tmp_path / "auth.log").is_file()
+    assert (tmp_path / "syslog").is_file()
+
+
+def test_generate_logs_auth_log_mentions_victim_user(tmp_path):
+    from generators import generate_logs
+    from generators.data import scenario_facts as sf
+
+    generate_logs.generate(output_dir=tmp_path, round_num=1)
+    text = (tmp_path / "auth.log").read_text()
+    assert sf.VICTIM_USERNAME in text
+    assert sf.VICTIM_HOSTNAME in text
