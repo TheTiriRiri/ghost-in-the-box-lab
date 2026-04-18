@@ -50,3 +50,13 @@ def test_r1_casefile_stolen_data_is_valid_jsonl():
     for line in p.read_text().splitlines():
         if line.strip():
             json.loads(line)
+
+
+def test_r1_casefile_zadania_is_polish_and_references_files():
+    text = (CASEFILE / "round-1" / "zadania.md").read_text(encoding="utf-8")
+    polish = sum(text.count(ch) for ch in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ")
+    assert polish >= 20
+    for fname in ("network-capture.pcap", "process-list.txt", "stolen-data-sample.json"):
+        assert fname in text, f"zadania.md does not reference {fname}"
+    assert "YARA" in text
+    assert "NIST SP 800-61" in text
