@@ -1,0 +1,23 @@
+Mar 14 08:05:00 workstation-042 CRON[12345]: (analyst) CMD (command_not_found spyware.py)
+Mar 14 08:05:02 workstation-042 systemd[1]: Started Session 4 of user analyst.
+Mar 14 08:06:00 workstation-042 CRON[12345]: (analyst) CMD (command_not_found spyware.py)
+Mar 14 08:06:02 workstation-042 systemd[1]: Started Session 5 of user analyst.
+Mar 14 08:07:05 workstation-042 CRON[12345]: (analyst) CMD (command_not_found spyware.py)
+Mar 14 08:07:07 workstation-042 systemd[1]: Started Session 6 of user analyst.
+Mar 14 08:08:02 workstation-042 CRON[12345]: (analyst) CMD (command_not_found spyware.py)
+Mar 14 08:08:04 workstation-042 systemd[1]: Started Session 7 of user analyst.
+Mar 14 08:09:01 workstation-042 CRON[12345]: (analyst) CMD (command_not_found spyware.py)
+Mar 14 08:09:03 workstation-042 systemd[1]: Started Session 8 of user analyst.
+Mar 14 08:10:01 workstation-042 CRON[12345]: (analyst) CMD (command_not_found spyware.py)
+Mar 14 08:10:03 workstation-042 systemd[1]: Started Session 9 of user analyst.
+Mar 14 08:11:01 workstation-042 CRON[12345]: (analyst) CMD (command_not_found spyware.py)
+Mar 14 08:11:03 workstation-042 systemd[1]: Started Session 10 of user analyst.
+Mar 14 08:12:05 workstation-042 CRON[12345]: (analyst) CMD (command_not_found spyware.py)
+Mar 14 08:12:07 workstation-042 systemd[1]: Started Session 11 of user analyst.
+Mar 14 08:13:00 workstation-042 CRON[12345]: (analyst) CMD (command_not_found spyware.py)
+Mar 14 08:13:02 workstation-042 systemd[1]: Started Session 12 of user analyst.
+Mar 14 08:14:05 workstation-042 CRON[12345]: (analyst) CMD (command_not_found spyware.py)
+Mar 14 08:14:07 workstation-042 systemd[1]: Started Session 13 of user analyst.
+Mar 14 08:05:30 workstation-042 kernel: [  150.876646] IN=eth0 OUT= SRC=10.13.37.50 DST=10.13.37.1 LEN=512 PROTO=TCP SPT=40000 DPT=8080 WINDOW=64240
+Mar 14 08:06:30 workstation-042 kernel: [  210.671858] IN=eth0 OUT= SRC=10.13.37.50 DST=10.13.37.1 LEN=512 PROTO=TCP SPT=40001 DPT=8080 WINDOW=64240
+Mar 14 08:07:30 workstation-042 kernel: [  270.191161] IN=eth0 OUT= SRC=10.13.37.50 DST=10.13.37.1 LEN=512 PROTO=TCP SPT=40002 DPT=8080 WINDOW=64240
