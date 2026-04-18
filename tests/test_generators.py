@@ -83,3 +83,43 @@ def test_generate_logs_auth_log_mentions_victim_user(tmp_path):
     text = (tmp_path / "auth.log").read_text()
     assert sf.VICTIM_USERNAME in text
     assert sf.VICTIM_HOSTNAME in text
+
+
+# --- generate_artifacts ----------------------------------------------------
+
+def test_generate_artifacts_is_deterministic(tmp_path):
+    from generators import generate_artifacts
+
+    a = tmp_path / "a"; b = tmp_path / "b"
+    a.mkdir(); b.mkdir()
+    generate_artifacts.generate(output_dir=a, round_num=1)
+    generate_artifacts.generate(output_dir=b, round_num=1)
+
+    for fname in ("process-list.txt", "stolen-data-sample.json"):
+        assert (a / fname).read_bytes() == (b / fname).read_bytes()
+
+
+def test_generate_artifacts_process_list_shows_spyware(tmp_path):
+    from generators import generate_artifacts
+    from generators.data import scenario_facts as sf
+
+    generate_artifacts.generate(output_dir=tmp_path, round_num=1)
+    text = (tmp_path / "process-list.txt").read_text()
+    assert "python3 /opt/spyware/spyware.py" in text
+    assert sf.VICTIM_USERNAME in text
+
+
+def test_generate_artifacts_stolen_data_contains_required_fields(tmp_path):
+    import json
+    from generators import generate_artifacts
+    from generators.data import scenario_facts as sf
+
+    generate_artifacts.generate(output_dir=tmp_path, round_num=1)
+    records = [json.loads(line) for line in
+               (tmp_path / "stolen-data-sample.json").read_text().splitlines() if line.strip()]
+    assert records, "stolen-data-sample.json empty"
+    for rec in records:
+        assert rec["host"] == sf.VICTIM_HOSTNAME
+        assert rec["user"] == sf.VICTIM_USERNAME
+        assert "keys" in rec
+        assert "files" in rec
